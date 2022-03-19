@@ -6,13 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shopnext/debug/debug_model.dart';
+
+import 'debug_model.dart';
 
 final _debugStorageKey = 'io.shopnext.debug.network_flag';
 
-class AppDebugApiCore {
-  static final AppDebugApiCore _apiCore = AppDebugApiCore._internal();
-  factory AppDebugApiCore() {
+class ApiDebug {
+  static final ApiDebug _apiCore = ApiDebug._internal();
+  factory ApiDebug() {
     return _apiCore;
   }
 
@@ -30,7 +31,7 @@ class AppDebugApiCore {
     enableDebug = result;
   }
 
-  AppDebugApiCore._internal() {
+  ApiDebug._internal() {
     print("AppDebugApiCore is now implemented");
     getDebugFlag();
   }
