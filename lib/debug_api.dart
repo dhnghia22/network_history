@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'debug_api_screen.dart';
 import 'debug_model.dart';
 
 final _debugStorageKey = 'io.shopnext.debug.network_flag';
@@ -34,6 +35,10 @@ class ApiDebug {
   ApiDebug._internal() {
     print("AppDebugApiCore is now implemented");
     getDebugFlag();
+  }
+
+  void openDebugScreen({required BuildContext ctx}) {
+    ApiDebug.navigate(ctx, (context) => NetworkHistoryScreen());
   }
 
   final BehaviorSubject<List<AppApiCall>> callsSubject = BehaviorSubject.seeded([]);
