@@ -3,26 +3,20 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopnext/debug/debug_model.dart';
 
-import 'debug_api_screen.dart';
-import 'debug_model.dart';
+final _debugStorageKey = 'io.shopnext.debug.network_flag';
 
-final _debugStorageKey = 'app.api.debug.network_flag';
-
-class ApiDebug {
-  static final ApiDebug _apiCore = ApiDebug._internal();
-  factory ApiDebug() {
+class AppDebugApiCore {
+  static final AppDebugApiCore _apiCore = AppDebugApiCore._internal();
+  factory AppDebugApiCore() {
     return _apiCore;
   }
 
   bool enableDebug = false;
-
-  void openDebugScreen({required BuildContext ctx}) {
-    ApiDebug.navigate(ctx, (context) => NetworkHistoryScreen());
-  }
 
   void updateDebugFlag(bool enable) async {
     enableDebug = enable;
@@ -36,7 +30,7 @@ class ApiDebug {
     enableDebug = result;
   }
 
-  ApiDebug._internal() {
+  AppDebugApiCore._internal() {
     print("AppDebugApiCore is now implemented");
     getDebugFlag();
   }
@@ -106,129 +100,135 @@ class ApiDebug {
   }
 
   void onRequest(RequestOptions options) {
-    final AppApiCall call = AppApiCall(options.hashCode);
+    try {
+      final AppApiCall call = AppApiCall(options.hashCode);
 
-    final Uri uri = options.uri;
-    call.method = options.method;
-    var path = options.uri.path;
-    if (path.isEmpty) {
-      path = "/";
-    }
-    call.endpoint = path;
-    call.server = uri.host;
-    call.client = "Dio";
-    call.uri = options.uri.toString();
-
-    call.cUrl = options.cUrl;
-
-    if (uri.scheme == "https") {
-      call.secure = true;
-    }
-
-    final AppApiDebugRequest request = AppApiDebugRequest();
-
-    final dynamic data = options.data;
-    if (data == null) {
-      request.size = 0;
-      request.body = "";
-    } else {
-      if (data is FormData) {
-        request.body += "Form data";
-
-        if (data.fields.isNotEmpty == true) {
-          final List<AppApiFormDataField> fields = [];
-          data.fields.forEach((entry) {
-            fields.add(AppApiFormDataField(entry.key, entry.value));
-          });
-          request.formDataFields = fields;
-        }
-        if (data.files.isNotEmpty == true) {
-          final List<AppApiFormDataFile> files = [];
-          data.files.forEach((entry) {
-            files.add(
-              AppApiFormDataFile(
-                entry.value.filename,
-                entry.value.contentType.toString(),
-                entry.value.length,
-              ),
-            );
-          });
-
-          request.formDataFiles = files;
-        }
-      } else {
-        request.size = utf8.encode(data.toString()).length;
-        request.body = data;
+      final Uri uri = options.uri;
+      call.method = options.method;
+      var path = options.uri.path;
+      if (path.isEmpty) {
+        path = "/";
       }
-    }
+      call.endpoint = path;
+      call.server = uri.host;
+      call.client = "Dio";
+      call.uri = options.uri.toString();
 
-    request.time = DateTime.now();
-    request.headers = options.headers;
-    request.contentType = options.contentType.toString();
-    request.queryParameters = options.queryParameters;
+      call.cUrl = options.cUrl;
 
-    call.request = request;
-    call.response = AppApiDebugResponse();
+      if (uri.scheme == "https") {
+        call.secure = true;
+      }
 
-    this._addCall(call);
+      final AppApiDebugRequest request = AppApiDebugRequest();
+
+      final dynamic data = options.data;
+      if (data == null) {
+        request.size = 0;
+        request.body = "";
+      } else {
+        if (data is FormData) {
+          request.body += "Form data";
+
+          if (data.fields.isNotEmpty == true) {
+            final List<AppApiFormDataField> fields = [];
+            data.fields.forEach((entry) {
+              fields.add(AppApiFormDataField(entry.key, entry.value));
+            });
+            request.formDataFields = fields;
+          }
+          if (data.files.isNotEmpty == true) {
+            final List<AppApiFormDataFile> files = [];
+            data.files.forEach((entry) {
+              files.add(
+                AppApiFormDataFile(
+                  entry.value.filename,
+                  entry.value.contentType.toString(),
+                  entry.value.length,
+                ),
+              );
+            });
+
+            request.formDataFiles = files;
+          }
+        } else {
+          request.size = utf8.encode(data.toString()).length;
+          request.body = data;
+        }
+      }
+
+      request.time = DateTime.now();
+      request.headers = options.headers;
+      request.contentType = options.contentType.toString();
+      request.queryParameters = options.queryParameters;
+
+      call.request = request;
+      call.response = AppApiDebugResponse();
+
+      this._addCall(call);
+    } catch (e) {}
   }
 
   void onResponse(Response response) {
-    final httpResponse = AppApiDebugResponse();
-    httpResponse.status = response.statusCode ?? -1;
+    try {
+      final httpResponse = AppApiDebugResponse();
+      httpResponse.status = response.statusCode ?? -1;
 
-    if (response.data == null) {
-      httpResponse.body = "";
-      httpResponse.size = 0;
-    } else {
-      httpResponse.body = response.data;
-      httpResponse.size = utf8.encode(response.data.toString()).length;
-    }
-
-    httpResponse.time = DateTime.now();
-    final Map<String, String> headers = {};
-    response.headers.forEach((header, values) {
-      headers[header] = values.toString();
-    });
-    httpResponse.headers = headers;
-
-    this._addResponse(httpResponse, response.requestOptions.hashCode);
-  }
-
-  void onError(DioError error) {
-    final httpError = AppApiDebugError();
-    httpError.error = error.toString();
-    if (error is Error) {
-      final basicError = error as Error;
-      httpError.stackTrace = basicError.stackTrace;
-    }
-
-    this._addError(httpError, error.requestOptions.hashCode);
-    final httpResponse = AppApiDebugResponse();
-    httpResponse.time = DateTime.now();
-    if (error.response == null) {
-      httpResponse.status = -1;
-      this._addResponse(httpResponse, error.requestOptions.hashCode);
-    } else {
-      httpResponse.status = error.response?.statusCode ?? -1;
-
-      if (error.response!.data == null) {
+      if (response.data == null) {
         httpResponse.body = "";
         httpResponse.size = 0;
       } else {
-        httpResponse.body = error.response!.data;
-        httpResponse.size = utf8.encode(error.response!.data.toString()).length;
+        httpResponse.body = response.data;
+        httpResponse.size = utf8.encode(response.data.toString()).length;
       }
+
+      httpResponse.time = DateTime.now();
       final Map<String, String> headers = {};
-      error.response!.headers.forEach((header, values) {
+      response.headers.forEach((header, values) {
         headers[header] = values.toString();
       });
       httpResponse.headers = headers;
-      this._addResponse(
-        httpResponse,
-        error.response!.requestOptions.hashCode,
-      );
-    }
+
+      this._addResponse(httpResponse, response.requestOptions.hashCode);
+    } catch (e) {}
+  }
+
+  void onError(DioError error) {
+    try {
+      final httpError = AppApiDebugError();
+      httpError.error = error.toString();
+      if (error is Error) {
+        final basicError = error as Error;
+        httpError.stackTrace = basicError.stackTrace;
+      }
+
+      this._addError(httpError, error.requestOptions.hashCode);
+      final httpResponse = AppApiDebugResponse();
+      httpResponse.time = DateTime.now();
+      if (error.response == null) {
+        httpResponse.status = -1;
+        this._addResponse(httpResponse, error.requestOptions.hashCode);
+      } else {
+        httpResponse.status = error.response?.statusCode ?? -1;
+
+        if (error.response!.data == null) {
+          httpResponse.body = "";
+          httpResponse.size = 0;
+        } else {
+          httpResponse.body = error.response!.data;
+          httpResponse.size = utf8.encode(error.response!.data.toString()).length;
+        }
+        final Map<String, String> headers = {};
+        error.response!.headers.forEach((header, values) {
+          headers[header] = values.toString();
+        });
+        httpResponse.headers = headers;
+        this._addResponse(
+          httpResponse,
+          error.response!.requestOptions.hashCode,
+        );
+      }
+    } catch (e) {}
   }
 
   static void navigate(BuildContext context, WidgetBuilder builder) {
@@ -370,7 +370,9 @@ extension CURLRepresentation on RequestOptions {
         components.add('-H \"$k: $v\"');
       }
     });
-    if (this.data != null && this.data.isNotEmpty) {
+
+
+    if (this.data != null && this.data is Map) {
       var data = json.encode(this.data);
       data = data.replaceAll('\"', '\\\"');
       components.add('-d \"$data\"');
