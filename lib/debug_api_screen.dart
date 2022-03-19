@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'debug_api_core.dart';
+import 'debug_api.dart';
 import 'debug_model.dart';
 
 class NetworkHistoryScreen extends StatefulWidget {
@@ -66,13 +66,13 @@ class _NetworkHistoryScreenState extends State<NetworkHistoryScreen> {
           CupertinoButton(
             padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
             child: Icon(Icons.delete, color: Colors.black), onPressed: () {
-              AppDebugApiCore().removeCalls();
+              ApiDebug().removeCalls();
             })
         ],
       ),
       body: Container(
         child: StreamBuilder<List<AppApiCall>>(
-          stream: AppDebugApiCore().callsSubject,
+          stream: ApiDebug().callsSubject,
           builder: (context, snapshot) {
             List<AppApiCall> calls = (snapshot.data ?? []).reversed.toList();
             return ListView.separated(
@@ -80,7 +80,7 @@ class _NetworkHistoryScreenState extends State<NetworkHistoryScreen> {
                   final item = calls[index];
                   return InkWell(
                     onTap: () {
-                      AppDebugApiCore.navigate(context, (context) => NetworkHistoryItemDetailScreen(call: item));
+                      ApiDebug.navigate(context, (context) => NetworkHistoryItemDetailScreen(call: item));
                     },
                     child: Container(
                       padding: EdgeInsets.all(16),
@@ -188,7 +188,7 @@ class _NetworkHistoryItemDetailScreenState extends State<NetworkHistoryItemDetai
               Item(title: 'Request Method', content: call.method),
               Item(title: 'Status Code', content: call.response?.getStatus ?? '---'),
               Item(title: 'Response Body', content: 'Tap to view', onTap: () {
-                AppDebugApiCore.navigate(context, (context) => ApiDebugViewJSONScreen(call: call));
+                ApiDebug.navigate(context, (context) => ApiDebugViewJSONScreen(call: call));
               }),
               Item(title: 'Request size', content: AppApiDebugConversionHelper.formatBytes(call.request?.size ?? 0)),
               Item(title: 'Response size', content: AppApiDebugConversionHelper.formatBytes(call.response?.size ?? 0)),

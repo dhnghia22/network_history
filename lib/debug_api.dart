@@ -12,16 +12,16 @@ import 'debug_model.dart';
 
 final _debugStorageKey = 'app.api.debug.network_flag';
 
-class AppDebugApiCore {
-  static final AppDebugApiCore _apiCore = AppDebugApiCore._internal();
-  factory AppDebugApiCore() {
+class ApiDebug {
+  static final ApiDebug _apiCore = ApiDebug._internal();
+  factory ApiDebug() {
     return _apiCore;
   }
 
   bool enableDebug = false;
 
   void openDebugScreen({required BuildContext ctx}) {
-    AppDebugApiCore.navigate(ctx, (context) => NetworkHistoryScreen());
+    ApiDebug.navigate(ctx, (context) => NetworkHistoryScreen());
   }
 
   void updateDebugFlag(bool enable) async {
@@ -36,7 +36,7 @@ class AppDebugApiCore {
     enableDebug = result;
   }
 
-  AppDebugApiCore._internal() {
+  ApiDebug._internal() {
     print("AppDebugApiCore is now implemented");
     getDebugFlag();
   }
