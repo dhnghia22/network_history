@@ -231,8 +231,7 @@ class ApiDebug {
     }
   }
 
-
-   static void navigate(BuildContext context, WidgetBuilder builder) {
+  static void navigate(BuildContext context, WidgetBuilder builder) {
     if (Platform.isIOS) {
       Navigator.of(context).push(CupertinoPageRoute(builder: builder));
     } else if (Platform.isAndroid) {
@@ -371,10 +370,11 @@ extension CURLRepresentation on RequestOptions {
         components.add('-H \"$k: $v\"');
       }
     });
-
-    var data = json.encode(this.data);
-    data = data.replaceAll('\"', '\\\"');
-    components.add('-d \"$data\"');
+    if (this.data != null && this.data.isNotEmpty) {
+      var data = json.encode(this.data);
+      data = data.replaceAll('\"', '\\\"');
+      components.add('-d \"$data\"');
+    }
 
     components.add('\"${this.uri.toString()}\"');
 
