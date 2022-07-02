@@ -377,11 +377,18 @@ extension CURLRepresentation on RequestOptions {
       }
     });
 
-
     if (this.data != null && this.data is Map) {
-      var data = json.encode(this.data);
-      data = data.replaceAll('\"', '\\\"');
-      components.add('-d \"$data\"');
+      var dataRaw = "";
+      if (options.data != null && options.data.isNotEmpty) {
+        var parametersList = [];
+        options.data.forEach((key, value) {
+          parametersList.add('$key=$value');
+        });
+        if (parametersList.length > 0) {
+          dataRaw = "${parametersList.join('&')}'";
+        }
+      }
+      components.add('--data-raw \"$dataRaw\"');
     }
 
     components.add('\"${this.uri.toString()}\"');
