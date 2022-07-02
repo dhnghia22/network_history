@@ -10,26 +10,63 @@ For general information about developing packages, see the Dart guide for
 and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+## Network History
+Network history debugger for Dio Http Client
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- View Network history.
+- View Request/response.
+- Copy cURL (Not support Multipart/form-data)
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add to pubspec
+```dart
+network_history:
+    git:
+      url: https://github.com/dhnghia22/network_history
+      ref: master
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Init
 
 ```dart
-const like = 'sample';
+ApiDebug()
+```
+
+Add function into Dio Interceptor
+```dart
+Dio _dio = Dio(BaseOptions(connectTimeout: 60000, baseUrl: 'https://localhoast:8080/'))
+    ..interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          ApiDebug().onRequest(options);
+          handler.next(options);
+        },
+        onError: (DioError dioError, ErrorInterceptorHandler handler) {
+          ApiDebug().onError(dioError);
+          handler.next(dioError);
+        },
+        onResponse: (Response response, ResponseInterceptorHandler handler) {
+          ApiDebug().onResponse(response);
+          handler.next(response);
+        },
+      ),
+    );
+```
+
+Enable Log request
+```dart
+ApiDebug().updateDebugFlag(true);
+```
+
+Open Network history
+
+```dart
+ApiDebug().openDebugScreen(ctx: your_context);
 ```
 
 ## Additional information
