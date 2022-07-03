@@ -379,9 +379,9 @@ extension CURLRepresentation on RequestOptions {
 
     if (this.data != null && this.data is Map) {
       var dataRaw = "";
-      if (options.data != null && options.data.isNotEmpty) {
+      if (this.data != null && this.data.isNotEmpty) {
         var parametersList = [];
-        options.data.forEach((key, value) {
+        this.data.forEach((key, value) {
           parametersList.add('$key=$value');
         });
         if (parametersList.length > 0) {
