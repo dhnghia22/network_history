@@ -47,15 +47,15 @@ class ApiDebug {
     callsSubject.close();
   }
 
-  AppApiCall? _selectCall(int requestId) => callsSubject.value?.firstWhere((call) => call.id == requestId);
+  AppApiCall? _selectCall(int requestId) => callsSubject.value.firstWhere((call) => call.id == requestId);
 
   void _addCall(AppApiCall call) {
     if (enableDebug == false) {
       return;
     }
-    final callsCount = (callsSubject.value ?? []).length;
+    final callsCount = callsSubject.value.length;
     if (callsCount >= 50) {
-      final originalCalls = callsSubject.value ?? [];
+      final originalCalls = callsSubject.value;
       final calls = List<AppApiCall>.from(originalCalls);
       calls.sort(
         (call1, call2) => call1.createdTime.compareTo(call2.createdTime),
@@ -65,7 +65,7 @@ class ApiDebug {
 
       callsSubject.add(originalCalls);
     } else {
-      callsSubject.add([...(callsSubject.value ?? []), call]);
+      callsSubject.add([...(callsSubject.value), call]);
     }
   }
 
@@ -81,7 +81,7 @@ class ApiDebug {
     }
 
     selectedCall.error = error;
-    callsSubject.add([...callsSubject.value ?? []]);
+    callsSubject.add([...callsSubject.value]);
   }
 
   void _addResponse(AppApiDebugResponse response, int requestId) {
@@ -98,7 +98,7 @@ class ApiDebug {
     selectedCall.response = response;
     selectedCall.duration = response.time.millisecondsSinceEpoch - selectedCall.request!.time.millisecondsSinceEpoch;
 
-    callsSubject.add([...callsSubject.value ?? []]);
+    callsSubject.add([...callsSubject.value]);
   }
 
   void removeCalls() {
