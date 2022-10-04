@@ -41,13 +41,15 @@ class ApiDebug {
     ApiDebug.navigate(ctx, (context) => NetworkHistoryScreen());
   }
 
-  final BehaviorSubject<List<AppApiCall>> callsSubject = BehaviorSubject.seeded([]);
+  final BehaviorSubject<List<AppApiCall>> callsSubject =
+      BehaviorSubject.seeded([]);
 
   void dispose() {
     callsSubject.close();
   }
 
-  AppApiCall? _selectCall(int requestId) => callsSubject.value.firstWhere((call) => call.id == requestId);
+  AppApiCall? _selectCall(int requestId) =>
+      callsSubject.value.firstWhere((call) => call.id == requestId);
 
   void _addCall(AppApiCall call) {
     if (enableDebug == false) {
@@ -96,7 +98,8 @@ class ApiDebug {
     }
     selectedCall.loading = false;
     selectedCall.response = response;
-    selectedCall.duration = response.time.millisecondsSinceEpoch - selectedCall.request!.time.millisecondsSinceEpoch;
+    selectedCall.duration = response.time.millisecondsSinceEpoch -
+        selectedCall.request!.time.millisecondsSinceEpoch;
 
     callsSubject.add([...callsSubject.value]);
   }
@@ -222,7 +225,8 @@ class ApiDebug {
           httpResponse.size = 0;
         } else {
           httpResponse.body = error.response!.data;
-          httpResponse.size = utf8.encode(error.response!.data.toString()).length;
+          httpResponse.size =
+              utf8.encode(error.response!.data.toString()).length;
         }
         final Map<String, String> headers = {};
         error.response!.headers.forEach((header, values) {
@@ -322,7 +326,8 @@ class AppApiDebugParser {
 
       var bodyContent = _emptyBody;
 
-      if (contentType == null || !contentType.toLowerCase().contains(_applicationJson)) {
+      if (contentType == null ||
+          !contentType.toLowerCase().contains(_applicationJson)) {
         final bodyTemp = body.toString();
 
         if (bodyTemp.isNotEmpty) {
@@ -379,20 +384,22 @@ extension CURLRepresentation on RequestOptions {
 
     if (this.data != null && this.data is Map) {
       var dataRaw = "";
-      if ((this.headers["content-type"] = Headers.jsonContentType || this.headers["Content-Type"] = Headers.jsonContentType)  && this.data is Map) {
-          final raw = jsonEncode(this.data);
-          if (raw.length > 0) {
-            dataRaw = "$raw";
-          }
-        } else {
-          var parametersList = [];
-          this.data.forEach((key, value) {
-            parametersList.add('$key=$value');
-          });
-          if (parametersList.length > 0) {
-            dataRaw = "${parametersList.join('&')}'";
-          }
+      if ((this.headers["content-type"] == Headers.jsonContentType ||
+              this.headers["Content-Type"] == Headers.jsonContentType) &&
+          this.data is Map) {
+        final raw = jsonEncode(this.data);
+        if (raw.length > 0) {
+          dataRaw = "$raw";
         }
+      } else {
+        var parametersList = [];
+        this.data.forEach((key, value) {
+          parametersList.add('$key=$value');
+        });
+        if (parametersList.length > 0) {
+          dataRaw = "${parametersList.join('&')}'";
+        }
+      }
       components.add('--data-raw \"$dataRaw\"');
     }
 
