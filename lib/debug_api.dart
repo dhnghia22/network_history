@@ -389,7 +389,7 @@ extension CURLRepresentation on RequestOptions {
           this.data is Map) {
         final raw = jsonEncode(this.data);
         if (raw.length > 0) {
-          dataRaw = "$raw";
+          dataRaw = '$raw';
         }
       } else {
         var parametersList = [];
