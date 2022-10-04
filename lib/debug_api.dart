@@ -391,6 +391,7 @@ extension CURLRepresentation on RequestOptions {
         if (raw.length > 0) {
           dataRaw = '$raw';
         }
+        components.add('--data-raw \'$dataRaw\'');
       } else {
         var parametersList = [];
         this.data.forEach((key, value) {
@@ -399,8 +400,8 @@ extension CURLRepresentation on RequestOptions {
         if (parametersList.length > 0) {
           dataRaw = "${parametersList.join('&')}'";
         }
+        components.add('--data-raw \"$dataRaw\"');
       }
-      components.add('--data-raw \"$dataRaw\"');
     }
 
     components.add('\"${this.uri.toString()}\"');
