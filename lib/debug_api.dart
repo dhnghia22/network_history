@@ -379,15 +379,20 @@ extension CURLRepresentation on RequestOptions {
 
     if (this.data != null && this.data is Map) {
       var dataRaw = "";
-      if (this.data != null && this.data.isNotEmpty) {
-        var parametersList = [];
-        this.data.forEach((key, value) {
-          parametersList.add('$key=$value');
-        });
-        if (parametersList.length > 0) {
-          dataRaw = "${parametersList.join('&')}'";
+      if ((this.headers["content-type"] = Headers.jsonContentType || this.headers["Content-Type"] = Headers.jsonContentType)  && this.data is Map) {
+          final raw = jsonEncode(this.data);
+          if (raw.length > 0) {
+            dataRaw = "$raw";
+          }
+        } else {
+          var parametersList = [];
+          this.data.forEach((key, value) {
+            parametersList.add('$key=$value');
+          });
+          if (parametersList.length > 0) {
+            dataRaw = "${parametersList.join('&')}'";
+          }
         }
-      }
       components.add('--data-raw \"$dataRaw\"');
     }
 
