@@ -197,7 +197,7 @@ class _NetworkHistoryItemDetailScreenState extends State<NetworkHistoryItemDetai
               SizedBox(height: 16),
               Text('REQUEST HEADER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ...(call.request?.headers.keys.toList() ?? []).map((e) {
-                return Item(title: '$e', content: call.request!.headers[e]);
+                return Item(title: '$e', content: '${call.request!.headers[e]}');
               }).toList(),
               if ((call.request?.queryParameters.keys.toList() ?? []).length > 0)
                 Column(
