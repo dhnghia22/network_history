@@ -58,14 +58,16 @@ class ApiDebug {
     final callsCount = callsSubject.value.length;
     if (callsCount >= 50) {
       final originalCalls = callsSubject.value;
-      final calls = List<AppApiCall>.from(originalCalls);
-      calls.sort(
-        (call1, call2) => call1.createdTime.compareTo(call2.createdTime),
-      );
-      final indexToReplace = (originalCalls).indexOf(calls.first);
-      originalCalls[indexToReplace] = call;
+      // final calls = List<AppApiCall>.from(originalCalls);
+      // calls.sort(
+      //   (call1, call2) => call1.createdTime.compareTo(call2.createdTime),
+      // );
+      // final indexToReplace = (originalCalls).indexOf(calls.first);
+      // originalCalls[indexToReplace] = call;
 
-      callsSubject.add(originalCalls);
+      // callsSubject.add(originalCalls);
+      originalCalls.removeAt(0);
+      callsSubject.add([...(originalCalls), call]);
     } else {
       callsSubject.add([...(callsSubject.value), call]);
     }
